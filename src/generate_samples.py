@@ -157,7 +157,7 @@ if __name__ == "__main__":
         region_col="State",
         article_col="article",
     )
-    data_sample.create_data_sample(0.005)
+    data_sample.create_data_sample(0.0005)
     longest = data_sample.get_max_length()
 
     max_tokens = int(longest * 1.3)
