@@ -18,12 +18,13 @@ class Dataset:
         for file in self.data_dir.glob("*.parquet"):
             year = file.stem
             article_df = pd.read_parquet(file)
+            article_df = article_df[['article', 'article_spellcheck']]
             if len(article_df) < 2:
                 print(f"Skipping {file.name}: {len(article_df)} rows")
                 continue
             train_df, val_df = train_test_split(article_df, test_size=(1 - train_percent), random_state=42)
-            train_df.to_parquet(self.train_dir / f"{year}_train.parquet")
-            val_df.to_parquet(self.val_dir / f"{year}_val.parquet")
+            train_df.to_csv(self.train_dir / f"{year}_train.csv", index=False)
+            val_df.to_csv(self.val_dir / f"{year}_val.csv", index=False)
 
 
 if __name__ == "__main__":
