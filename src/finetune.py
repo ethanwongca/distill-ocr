@@ -4,10 +4,9 @@ from datasets import load_dataset
 
 
 class StudentModel:
-    def __init__(self, data_dir: str, model: str, weight_store_dir: str, max_length: int = 4096):
+    def __init__(self, data_dir: str, model: str, weight_store_dir: str):
         self.train_dir = Path(data_dir) / "train"
         self.val_dir = Path(data_dir) / "val"
-        self.max_length = max_length
         # Full fine-tune: every parameter is trainable, no adapters
         self.model = AutoModelForCausalLM.from_pretrained(model, dtype="auto")
         self.model.config.use_cache = False
@@ -26,9 +25,7 @@ class StudentModel:
         prompt_ids = self.tokenizer(example["article"], add_special_tokens=False)["input_ids"] + [eos]
         target_ids = self.tokenizer(example["article_spellcheck"], add_special_tokens=False)["input_ids"] + [eos]
 
-        input_ids = (prompt_ids + target_ids)[:self.max_length]
-        labels = ([-100] * len(prompt_ids) + target_ids)[:self.max_length]
-        return {"input_ids": input_ids, "labels": labels}
+        return {"input_ids": prompt_ids + target_ids, "labels": [-100] * len(prompt_ids) + target_ids}
 
     def finetune(self):
         """
